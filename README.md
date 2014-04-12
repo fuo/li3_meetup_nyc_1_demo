@@ -13,7 +13,7 @@ Check that everything is working at `33.33.33.20`.  You should get the standard 
 
     vagrant ssh job
 
-change listen address to 33.33.33.21
+change listen address to `33.33.33.21`
 
 	sudo vi /etc/default/gearman-job-server
 

@@ -39,6 +39,20 @@ when "debian", "ubuntu"
     notifies :run, "execute[apt-get update]", :immediately
   end
 
+  apt_repository "mariadb" do
+    uri "http://ftp.kaist.ac.kr/mariadb/repo/5.3/ubuntu"
+    distribution "oneiric"
+    components ["main"]
+    keyserver "keyserver.ubuntu.com"
+    key "0xcbcb082a1bb943db"
+    action :add
+    notifies :run, "execute[apt-get update]", :immediately
+  end
+
+  package "mariadb" do
+    package_name "mariadb-server"
+  end
+
   package "mongodb" do
     package_name "mongodb-10gen"
   end

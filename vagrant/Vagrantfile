@@ -19,17 +19,31 @@ Vagrant.configure("2") do |config|
     # app_config.vm.forward_port "http", 80, 8080
 
     app_config.vm.provider "virtualbox" do |v|
-      v.name = "Li3 Demo - App Server"
+      v.name = "Li3 Demo - app Server"
       # v.cpuexecutioncap = 50
       v.memory = 1024
       v.cpus = 1      
     end
-
+    
+    # app_config.vbguest.iso_path = "/applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso"
+    
+    # https://github.com/mitchellh/vagrant/issues/3341
+    # vagrant plugin install vagrant-vbguest
+    # sudo ln -s /opt/VBoxGuestAdditions-4.3.10/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions    
 
     # Share an additional folder to the guest VM. The first argument is
     # an identifier, the second is the path on the guest to mount the
     # folder, and the third is the path on the host to the actual folder.    
-    app_config.vm.synced_folder "../data", "/var/www"
+    # app_config.vm.synced_folder "../data", "/var/www", :nfs => true
+    
+    app_config.vm.synced_folder "../data", "/var/www", owner: "www-data",
+        group: "www-data",
+        mount_options: ["dmode=775,fmode=664"]
+
+    # app_config.vm.synced_folder "../data", "/var/www", :nfs => true    
+    
+    
+    app_config.vm.provision :shell, :inline => "sudo apt-get -y install libsasl2-dev"
 
     # Enable provisioning with chef solo, specifying a cookbooks path (relative
     # to this Vagrantfile), and adding some recipes and/or roles.
@@ -37,12 +51,27 @@ Vagrant.configure("2") do |config|
     app_config.vm.provision :chef_solo do |chef|
       chef.cookbooks_path = "cookbooks"
       chef.add_recipe "mongodb::10gen_repo"
-      chef.add_recipe "nginx"
+      chef.add_recipe "memcached"
+      chef.add_recipe "nginx::default"
+      chef.add_recipe "nginx::dev"      
       chef.add_recipe "php-fpm"
       chef.add_recipe "php::module_mongo"
+      chef.add_recipe "php::module_mysql"      
+      chef.add_recipe "php::module_curl"      
+      chef.add_recipe "php::module_gd"
+      chef.add_recipe "php::module_memcache"
+      chef.add_recipe "php::module_apc"                                    
+      chef.add_recipe "php::module_mcrypt"                                          
       chef.add_recipe "gearman::php"
     end
-  end
+
+    # app_config.vm.provision :shell, :inline => "sudo apt-get install python-software-properties && sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db && sudo add-apt-repository 'deb http://ftp.kaist.ac.kr/mariadb/repo/5.3/ubuntu oneiric main' && echo mysql-server mysql-server/root_password password phuong | sudo debconf-set-selections && echo mysql-server mysql-server/root_password_again password phuong | sudo debconf-set-selections && sudo apt-get -y install mariadb-server"
+      app_config.vm.provision :shell, :inline => "sudo apt-get -y install git imagemagick php5-imagick && sudo service php5-fpm restart && sudo nxensite dev && sudo service nginx restart"
+
+      # app_config.vm.provision :shell, :inline => "cd /var/www/PrestaShop && sudo chmod -R o+w config/ && sudo chmod -R o+w cache/ && sudo chmod -R o+w log/ && sudo chmod -R o+w img/ && sudo chmod -R o+w mails/ && sudo chmod -R o+w modules/ && sudo chmod -R o+w themes/default-bootstrap/lang/ && sudo chmod -R o+w themes/default-bootstrap/pdf/lang/ && sudo chmod -R o+w themes/default-bootstrap/cache/ && sudo chmod -R o+w translations/ && sudo chmod -R o+w upload/ && sudo chmod -R o+w download/"
+
+      app_config.vm.provision :shell, :inline => "echo 'CREATE DATABASE IF NOT EXISTS test' | mysql -u root"
+  end  
 
   config.vm.define "job" do |job_config|
     # Every Vagrant virtual environment requires a box to build off of.
@@ -73,9 +102,13 @@ Vagrant.configure("2") do |config|
     # Share an additional folder to the guest VM. The first argument is
     # an identifier, the second is the path on the guest to mount the
     # folder, and the third is the path on the host to the actual folder.
-    job_config.vm.synced_folder "../data", "/var/www"
+    job_config.vm.synced_folder "../data", "/var/www", owner: "www-data",
+        group: "www-data",
+        mount_options: ["dmode=775,fmode=664"]
 
-    job_config.vm.provision :shell, :inline => "sudo apt-get update --fix-missing"
+    # job_config.vm.synced_folder "../data", "/var/www", :nfs => true    
+
+    job_config.vm.provision :shell, :inline => "sudo apt-get update --fix-missing && sudo apt-get -y install libsasl2-dev"
 
     # Enable provisioning with chef solo, specifying a cookbooks path (relative
     # to this Vagrantfile), and adding some recipes and/or roles.
