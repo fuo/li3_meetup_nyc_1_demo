@@ -71,6 +71,9 @@ Vagrant.configure("2") do |config|
       # app_config.vm.provision :shell, :inline => "cd /var/www/PrestaShop && sudo chmod -R o+w config/ && sudo chmod -R o+w cache/ && sudo chmod -R o+w log/ && sudo chmod -R o+w img/ && sudo chmod -R o+w mails/ && sudo chmod -R o+w modules/ && sudo chmod -R o+w themes/default-bootstrap/lang/ && sudo chmod -R o+w themes/default-bootstrap/pdf/lang/ && sudo chmod -R o+w themes/default-bootstrap/cache/ && sudo chmod -R o+w translations/ && sudo chmod -R o+w upload/ && sudo chmod -R o+w download/"
 
       app_config.vm.provision :shell, :inline => "echo 'CREATE DATABASE IF NOT EXISTS test' | mysql -u root"
+      
+      app_config.vm.provision :shell, :inline => "mysql -uroot -h localhost test < /var/www/test_2014-04-21.sql"
+      
   end  
 
   config.vm.define "job" do |job_config|
