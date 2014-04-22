@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
     # folder, and the third is the path on the host to the actual folder.    
     # app_config.vm.synced_folder "../data", "/var/www", :nfs => true
     
-    app_config.vm.provision :shell, :inline => "sudo ln -s /opt/VBoxGuestAdditions-4.3.10/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions"
+    # app_config.vm.provision :shell, :inline => "sudo ln -s /opt/VBoxGuestAdditions-4.3.10/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions"
     
     app_config.vm.synced_folder "../data", "/var/www", owner: "www-data",
         group: "www-data",
