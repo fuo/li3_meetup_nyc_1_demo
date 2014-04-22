@@ -10,3 +10,6 @@
 [submodule "vagrant/cookbooks/memcached"]
 	path = vagrant/cookbooks/memcached
 	url = https://github.com/opscode-cookbooks/memcached.git
+[submodule "data/dev"]
+	path = data/dev
+	url = git@bitbucket.org:nhacon/vagrant.git
