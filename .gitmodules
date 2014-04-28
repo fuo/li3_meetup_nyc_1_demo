@@ -13,3 +13,6 @@
 [submodule "data/dev"]
 	path = data/dev
 	url = git@bitbucket.org:nhacon/vagrant.git
+[submodule "data/tool"]
+	path = data/tool
+	url = git@bitbucket.org:nhacon_kp/nhacon-tools1.git
