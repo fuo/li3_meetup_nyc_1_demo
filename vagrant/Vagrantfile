@@ -1,11 +1,11 @@
 Vagrant.configure("2") do |config|
   config.vm.define "app" do |app_config|
     # Every Vagrant virtual environment requires a box to build off of.
-    app_config.vm.box = "ubuntu-11.10-server-amd64"
+    app_config.vm.box = "nc-base3"
 
     # The url from where the 'config.vm.box' box will be fetched if it
     # doesn't already exist on the user's system.
-    app_config.vm.box_url = "http://dl.dropbox.com/u/6721656/cgarvis-ubuntu-11.10-server-amd64.box"
+    app_config.vm.box_url = ""
 
     # Boot with a GUI so you can see the screen. (Default is headless)
     # app_config.vm.boot_mode = :gui
@@ -19,8 +19,9 @@ Vagrant.configure("2") do |config|
     # app_config.vm.forward_port "http", 80, 8080
 
     app_config.vm.provider "virtualbox" do |v|
-      v.name = "Li3 Demo - app Server"
-      # v.cpuexecutioncap = 50
+      v.name = "nc-base"
+      v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]      
+      v.customize ["modifyvm", :id, "--pae", "on"]            
       v.memory = 512
       v.cpus = 1      
     end
@@ -38,7 +39,7 @@ Vagrant.configure("2") do |config|
     
     # app_config.vm.provision :shell, :inline => "sudo ln -s /opt/VBoxGuestAdditions-4.3.10/lib/VBoxGuestAdditions /usr/lib/VBoxGuestAdditions"
     
-    app_config.vm.synced_folder "../data", "/var/www", owner: "www-data",
+    app_config.vm.synced_folder "../data", "/var/www", owner: "www-data", 
         group: "www-data",
         mount_options: ["dmode=775,fmode=664"]
 
@@ -74,62 +75,65 @@ Vagrant.configure("2") do |config|
 
       # app_config.vm.provision :shell, :inline => "cd /var/www/PrestaShop && sudo chmod -R o+w config/ && sudo chmod -R o+w cache/ && sudo chmod -R o+w log/ && sudo chmod -R o+w img/ && sudo chmod -R o+w mails/ && sudo chmod -R o+w modules/ && sudo chmod -R o+w themes/default-bootstrap/lang/ && sudo chmod -R o+w themes/default-bootstrap/pdf/lang/ && sudo chmod -R o+w themes/default-bootstrap/cache/ && sudo chmod -R o+w translations/ && sudo chmod -R o+w upload/ && sudo chmod -R o+w download/"
 
+      app_config.vm.provision :shell, :inline => "sudo rm -rf /var/www/tool/protected/config/db.php && sudo cp /var/www/db.php /var/www/tool/protected/config/"
+
       app_config.vm.provision :shell, :inline => "echo 'CREATE DATABASE IF NOT EXISTS test' | mysql -u root"
       app_config.vm.provision :shell, :inline => "echo 'CREATE DATABASE IF NOT EXISTS tool1' | mysql -u root"
       
       app_config.vm.provision :shell, :inline => "mysql -uroot -h localhost test < /var/www/test_2014-04-21.sql"
       app_config.vm.provision :shell, :inline => "mysql -uroot -h localhost tool1 < /var/www/tool1_2014-04-27.sql"
-
-      app_config.vm.provision :shell, :inline => "sudo chmod +x /tmp/vagrant-shell && /tmp/vagrant-shell && sudo chmod +x /var/www/tool/protected/yiic && cd /var/www/tool && ./protected/yiic migrate --interactive=0"
+      
+      
+      # app_config.vm.provision :shell, :inline => "sudo -H bash -l && chmod +x /tmp/vagrant-shell && /tmp/vagrant-shell && sudo chmod +x /var/www/tool/protected/yiic && cd /var/www/tool && ./protected/yiic migrate --interactive=0"
       
   end  
 
-  config.vm.define "job" do |job_config|
-    # Every Vagrant virtual environment requires a box to build off of.
-    job_config.vm.box = "ubuntu-11.10-server-amd64"
-
-    # The url from where the 'config.vm.box' box will be fetched if it
-    # doesn't already exist on the user's system.
-    job_config.vm.box_url = "http://dl.dropbox.com/u/6721656/cgarvis-ubuntu-11.10-server-amd64.box"
-
-    # Boot with a GUI so you can see the screen. (Default is headless)
-    # job_config.vm.boot_mode = :gui
-
-    # Assign this VM to a host only network IP, allowing you to access it
-    # via the IP.
-    job_config.vm.network "private_network", ip: "33.33.33.21"
-
-    # Forward a port from the guest to the host, which allows for outside
-    # computers to access the VM, whereas host only networking does not.
-    # job_config.vm.forward_port "http", 80, 8080
-
-    job_config.vm.provider "virtualbox" do |v|
-      v.name = "Li3 Demo - Job Server"
-      # v.cpuexecutioncap = 50
-      v.memory = 1024
-      v.cpus = 1      
-    end
-
-    # Share an additional folder to the guest VM. The first argument is
-    # an identifier, the second is the path on the guest to mount the
-    # folder, and the third is the path on the host to the actual folder.
-    job_config.vm.synced_folder "../data", "/var/www", owner: "www-data",
-        group: "www-data",
-        mount_options: ["dmode=775,fmode=664"]
-
-    # job_config.vm.synced_folder "../data", "/var/www", :nfs => true    
-
-    job_config.vm.provision :shell, :inline => "sudo apt-get update --fix-missing && sudo apt-get -y install libsasl2-dev"
-
-    # Enable provisioning with chef solo, specifying a cookbooks path (relative
-    # to this Vagrantfile), and adding some recipes and/or roles.
-    #
-    job_config.vm.provision :chef_solo do |chef|
-      chef.cookbooks_path = "cookbooks"
-      chef.add_recipe "php"
-      chef.add_recipe "php::module_mongo"
-      chef.add_recipe "gearman::server"
-      chef.add_recipe "gearman::php"
-    end
-  end
+  # config.vm.define "job" do |job_config|
+  #     # Every Vagrant virtual environment requires a box to build off of.
+  #     job_config.vm.box = "ubuntu-11.10-server-amd64"
+  # 
+  #     # The url from where the 'config.vm.box' box will be fetched if it
+  #     # doesn't already exist on the user's system.
+  #     job_config.vm.box_url = "http://dl.dropbox.com/u/6721656/cgarvis-ubuntu-11.10-server-amd64.box"
+  # 
+  #     # Boot with a GUI so you can see the screen. (Default is headless)
+  #     # job_config.vm.boot_mode = :gui
+  # 
+  #     # Assign this VM to a host only network IP, allowing you to access it
+  #     # via the IP.
+  #     job_config.vm.network "private_network", ip: "33.33.33.21"
+  # 
+  #     # Forward a port from the guest to the host, which allows for outside
+  #     # computers to access the VM, whereas host only networking does not.
+  #     # job_config.vm.forward_port "http", 80, 8080
+  # 
+  #     job_config.vm.provider "virtualbox" do |v|
+  #       v.name = "Li3 Demo - Job Server"
+  #       # v.cpuexecutioncap = 50
+  #       v.memory = 1024
+  #       v.cpus = 1      
+  #     end
+  # 
+  #     # Share an additional folder to the guest VM. The first argument is
+  #     # an identifier, the second is the path on the guest to mount the
+  #     # folder, and the third is the path on the host to the actual folder.
+  #     job_config.vm.synced_folder "../data", "/var/www", owner: "www-data",
+  #         group: "www-data",
+  #         mount_options: ["dmode=775,fmode=664"]
+  # 
+  #     # job_config.vm.synced_folder "../data", "/var/www", :nfs => true    
+  # 
+  #     job_config.vm.provision :shell, :inline => "sudo apt-get update --fix-missing && sudo apt-get -y install libsasl2-dev"
+  # 
+  #     # Enable provisioning with chef solo, specifying a cookbooks path (relative
+  #     # to this Vagrantfile), and adding some recipes and/or roles.
+  #     #
+  #     job_config.vm.provision :chef_solo do |chef|
+  #       chef.cookbooks_path = "cookbooks"
+  #       chef.add_recipe "php"
+  #       chef.add_recipe "php::module_mongo"
+  #       chef.add_recipe "gearman::server"
+  #       chef.add_recipe "gearman::php"
+  #     end
+  #   end
 end
