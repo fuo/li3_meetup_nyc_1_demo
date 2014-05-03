@@ -77,14 +77,13 @@ Vagrant.configure("2") do |config|
 
       app_config.vm.provision :shell, :inline => "sudo rm -rf /var/www/tool/protected/config/db.php && sudo cp /var/www/db.php /var/www/tool/protected/config/"
 
-      app_config.vm.provision :shell, :inline => "echo 'CREATE DATABASE IF NOT EXISTS test' | mysql -u root"
-      app_config.vm.provision :shell, :inline => "echo 'CREATE DATABASE IF NOT EXISTS tool1' | mysql -u root"
+      app_config.vm.provision :shell, :inline => "echo 'create database if not exists test character set = utf8 collate = utf8_unicode_ci' | mysql -u root"
+      app_config.vm.provision :shell, :inline => "echo 'create database if not exists tool1 character set = utf8 collate = utf8_unicode_ci' | mysql -u root"
       
       app_config.vm.provision :shell, :inline => "mysql -uroot -h localhost test < /var/www/test_2014-04-21.sql"
       app_config.vm.provision :shell, :inline => "mysql -uroot -h localhost tool1 < /var/www/tool1_2014-04-27.sql"
-      
-      
-      # app_config.vm.provision :shell, :inline => "sudo -H bash -l && chmod +x /tmp/vagrant-shell && /tmp/vagrant-shell && sudo chmod +x /var/www/tool/protected/yiic && cd /var/www/tool && ./protected/yiic migrate --interactive=0"
+            
+      app_config.vm.provision :shell, :inline => "sudo -H bash -l && cd /var/www/tool && ./protected/yiic migrate --interactive=0"
       
   end  
 
